@@ -49,6 +49,8 @@ Call dentist         14:24:12 PM
 ## Dependencies
 
 - `chrono` - Date and time handling
+- `serde` - Serializing and Deserializing Data Structures
+- `serde-json` - Mapping json to rust Data Structures  
 
 ## License
 

@@ -1,10 +1,14 @@
 use chrono::Utc;
+use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::BufWriter;
-use std::io::{self, BufReader};
+use std::io::{BufReader};
 use std::path::Path;
 use std::vec;
+mod util;
+use util::Cli;
+use util::Commands;
 
 #[derive(Serialize, Deserialize)]
 struct Data {
@@ -13,24 +17,21 @@ struct Data {
 }
 
 fn main() {
-    println!("Enter value to notes or quit to close the program");
-
-    loop {
-        let mut input_text = String::new();
-        io::stdin()
-            .read_line(&mut input_text)
-            .expect("Failed to read message");
-
-        let new_text = input_text.trim().to_string();
-
-        if new_text.to_lowercase() != "quit" {
-            add_new_entry(new_text);
-        } else if new_text.to_lowercase() == "quit" {
-            println!("\n");
-            break;
+    let cli = Cli::parse();
+    
+    match cli.command {
+        Commands::Add { note }=> {
+            add_new_entry(note);
+            println!("Node Added!");
+        }
+        Commands::List {  }=> {
+            get_todo();
+        }
+        Commands::Clear {  }=>{
+            clear();
+            println!("List Cleared")
         }
     }
-    get_todo();
 }
 
 fn add_new_entry(data: String) {
@@ -71,4 +72,8 @@ fn get_todo() {
     for todo in todos {
         println!("{:<20} {:<20}", todo.note, todo.time);
     }
+}
+
+fn clear(){
+    File::create("store.json").unwrap();
 }
