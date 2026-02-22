@@ -34,7 +34,7 @@ Enter your notes one per line. Type `quit` to exit and view all entries with tim
 
 ### Example
 
-```
+``` 
 Enter value to notes or quit to close the program
 Buy groceries
 Call dentist
