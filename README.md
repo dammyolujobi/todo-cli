@@ -1,13 +1,16 @@
 # Todo CLI
 
-A simple command-line note-taking application written in Rust.
+A simple command-line todo/task management application written in Rust.
 
 ## Features
 
-- Add notes quickly from the terminal with a single command
-- Automatic timestamp for each entry
-- View all notes with their creation times
-- Clear all notes when needed
+- Add tasks quickly from the terminal with a single command
+- Automatic timestamp and index for each task
+- View all tasks with their creation times and indices
+- Delete specific tasks by index
+- Mark tasks as complete (moves them to a completed tasks list)
+- View all completed tasks with completion dates
+- Clear all tasks when needed
 - Persistent storage in a cross-platform config directory
 
 ## Requirements
@@ -56,26 +59,48 @@ The executable will be located at `target/release/todo-cli` (or `todo-cli.exe` o
 
 ## Usage
 
-The application provides three subcommands:
+The application provides six subcommands:
 
-### Add a note
+### Add a task
 
 ```bash
-todo-cli add "Your note text"
+todo-cli add "Your task description"
 ```
 
 Or using cargo:
 ```bash
-cargo run -- add "Your note text"
+cargo run -- add "Your task description"
 ```
 
-### List all notes
+### List all tasks
 
 ```bash
 todo-cli list
 ```
 
-### Clear all notes
+### Delete a task
+
+Delete a specific task by its index number:
+
+```bash
+todo-cli delete <index>
+```
+
+### Complete a task
+
+Mark a task as completed (removes it from the active list and adds it to completed tasks):
+
+```bash
+todo-cli complete <index>
+```
+
+### View completed tasks
+
+```bash
+todo-cli get-completed
+```
+
+### Clear all tasks
 
 ```bash
 todo-cli clear
@@ -84,21 +109,45 @@ todo-cli clear
 ### Example Session
 
 ```bash
-# Add some notes
+# Add some tasks
 $ todo-cli add "Buy groceries"
 Node Added!
 
 $ todo-cli add "Call dentist"
 Node Added!
 
-# View all notes
-$ todo-cli list
-Note                 Time
-----------------------------------------
-Buy groceries        14:23:45 PM
-Call dentist         14:24:12 PM
+$ todo-cli add "Finish project report"
+Node Added!
 
-# Clear all notes
+# View all tasks
+$ todo-cli list
+Index                Note                 Time                
+--------------------------------------------------------------
+1                    Buy groceries        14:23:45 PM         
+2                    Call dentist         14:24:12 PM         
+3                    Finish project report 14:25:03 PM         
+
+# Complete a task
+$ todo-cli complete 2
+Task Completed
+
+# Delete a task
+$ todo-cli delete 1
+Value Deleted
+
+# View remaining tasks
+$ todo-cli list
+Index                Note                 Time                
+--------------------------------------------------------------
+1                    Finish project report 14:25:03 PM         
+
+# View completed tasks
+$ todo-cli get-completed
+Index                Note                 Time Completed      
+--------------------------------------------------------------
+1                    Call dentist         Sunday 23 2026
+
+# Clear all tasks
 $ todo-cli clear
 List Cleared
 ```
@@ -113,13 +162,23 @@ List Cleared
 
 ## Data Storage
 
-Notes are stored in a `store.json` file in your system's config directory:
+Tasks are stored in JSON files in your system's config directory:
 
-- **Linux**: `~/.config/todo-cli/store.json`
-- **macOS**: `~/Library/Application Support/todo-cli/store.json`
-- **Windows**: `%APPDATA%\todo-cli\store.json` (typically `C:\Users\USERNAME\AppData\Roaming\todo-cli\store.json`)
+### Active Tasks
+`store.json` contains all active (incomplete) tasks:
 
-The directory and file are created automatically on the first use.
+- **Linux**: `~/.config/store.json`
+- **macOS**: `~/Library/Application Support/store.json`
+- **Windows**: `%APPDATA%\store.json` (typically `C:\Users\USERNAME\AppData\Roaming\store.json`)
+
+### Completed Tasks
+`completed.json` contains all completed tasks:
+
+- **Linux**: `~/.config/completed.json`
+- **macOS**: `~/Library/Application Support/completed.json`
+- **Windows**: `%APPDATA%\completed.json` (typically `C:\Users\USERNAME\AppData\Roaming\completed.json`)
+
+Both files are created automatically on first use.
 
 ## License
 
