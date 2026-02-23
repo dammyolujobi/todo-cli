@@ -9,12 +9,15 @@ use std::vec;
 mod util;
 use util::Cli;
 use util::Commands;
+use dirs;
 
 #[derive(Serialize, Deserialize)]
 struct Data {
     note: String,
     time: String,
 }
+
+
 
 fn main() {
     let cli = Cli::parse();
@@ -35,6 +38,9 @@ fn main() {
 }
 
 fn add_new_entry(data: String) {
+    let config_dir = dirs::config_dir().expect("Could not find config dir");
+    let store_path = config_dir.join("store.json");
+
     let utc_now = Utc::now();
     let utc_now_string = utc_now.format("%H:%M:%S %p").to_string();
 
@@ -43,18 +49,18 @@ fn add_new_entry(data: String) {
         time: utc_now_string,
     };
 
-    if Path::new("store.json").exists() {
-        let file = File::open("store.json").unwrap();
+    if Path::new(&store_path).exists() {
+        let file = File::open(&store_path).unwrap();
         let reader = BufReader::new(file);
         let mut todos: Vec<Data> = serde_json::from_reader(reader).unwrap();
 
         todos.push(note);
 
-        let file = File::create("store.json").unwrap();
+        let file = File::create(&store_path).unwrap();
         let writer = BufWriter::new(file);
         serde_json::to_writer_pretty(writer, &todos).unwrap();
     } else {
-        let file = File::create("store.json").unwrap();
+        let file = File::create(&store_path).unwrap();
         let writer = BufWriter::new(file);
         let todos: Vec<Data> = vec![note];
         serde_json::to_writer_pretty(writer, &todos).unwrap();
@@ -62,18 +68,36 @@ fn add_new_entry(data: String) {
 }
 
 fn get_todo() {
-    println!("{:<20} {:<20}", "Note", "Time");
-    println!("{:-<40}", "");
-    let store = File::open("store.json").unwrap();
-    let reader = BufReader::new(store);
+    let config_dir = dirs::config_dir().expect("Could not find config dir");
+    let store_path = config_dir.join("store.json");
 
-    let todos: Vec<Data> = serde_json::from_reader(reader).unwrap();
-
-    for todo in todos {
-        println!("{:<20} {:<20}", todo.note, todo.time);
+    if !Path::new(&store_path).exists()  {
+        let _ = File::create(&store_path).unwrap();
     }
+
+    let store = File::open(&store_path).unwrap();
+    
+    if store.metadata().unwrap().len() == 0 {
+        println!("{:<20} {:<20}", "Note", "Time");
+        println!("{:-<40}", "");
+    }
+    else {
+        println!("{:<20} {:<20}", "Note", "Time");
+        println!("{:-<40}", "");
+
+        let reader = BufReader::new(store);
+        let todos: Vec<Data> = serde_json::from_reader(reader).unwrap();
+
+        for todo in todos {
+            println!("{:<20} {:<20}", todo.note, todo.time);
+        }
+    }
+    
 }
 
 fn clear(){
-    File::create("store.json").unwrap();
+    let config_dir = dirs::config_dir().expect("Could not find config dir").join("store.json");
+    let store_path = config_dir.join("store.json");
+
+    File::create(&store_path).unwrap();
 }

@@ -8,7 +8,7 @@ A simple command-line note-taking application written in Rust.
 - Automatic timestamp for each entry
 - View all notes with their creation times
 - Clear all notes when needed
-- Persistent storage in JSON format
+- Persistent storage in a cross-platform config directory
 
 ## Requirements
 
@@ -16,29 +16,43 @@ A simple command-line note-taking application written in Rust.
 
 ## Installation
 
-Clone the repository and build the project:
+Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/dammyolujobi/todo-cli.git
 cd todo-cli
+```
+
+### Install globally (Recommended)
+
+Install the CLI tool to Cargo's bin directory (automatically added to PATH):
+
+```bash
+cargo install --path .
+```
+
+After installation, you can use `todo-cli` from anywhere on your system.
+
+To update after pulling new changes:
+```bash
+git pull
+cargo install --path .
+```
+
+To uninstall:
+```bash
+cargo uninstall todo-cli
+```
+
+### Or build locally
+
+If you prefer to build without installing:
+
+```bash
 cargo build --release
 ```
 
-The executable will be located at `target/release/todo-cli` (or `todo-cli.exe` on Windows).
-
-### Optional: Add to PATH
-
-For convenient access from anywhere, add the release folder to your system PATH:
-
-**Windows (PowerShell):**
-```powershell
-$env:PATH += ";C:\path\to\todo-cli\target\release"
-```
-
-**Linux/macOS:**
-```bash
-export PATH=$PATH:/path/to/todo-cli/target/release
-```
+The executable will be located at `target/release/todo-cli` (or `todo-cli.exe` on Windows)
 
 ## Usage
 
@@ -95,10 +109,17 @@ List Cleared
 - `serde` - Serializing and Deserializing Data Structures
 - `serde_json` - Mapping JSON to Rust Data Structures
 - `clap` - Command-line argument parser
+- `dirs` - Cross-platform system directories
 
 ## Data Storage
 
-Notes are stored in a `store.json` file in the project directory. The file is created automatically on the first use.
+Notes are stored in a `store.json` file in your system's config directory:
+
+- **Linux**: `~/.config/todo-cli/store.json`
+- **macOS**: `~/Library/Application Support/todo-cli/store.json`
+- **Windows**: `%APPDATA%\todo-cli\store.json` (typically `C:\Users\USERNAME\AppData\Roaming\todo-cli\store.json`)
+
+The directory and file are created automatically on the first use.
 
 ## License
 
