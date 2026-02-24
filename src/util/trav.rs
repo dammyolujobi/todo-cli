@@ -25,6 +25,37 @@ fn increase_comp_index(todos:&Vec<CompletedNotes>) -> i32 {
     return todos.last().map_or(1, |t| t.index + 1);
 }
 
+pub fn delete_completed(index:usize) {
+        let config_dir = dirs::config_dir().expect("Could not find config dir");
+    let store_path = config_dir.join("completed.json");
+
+    if Path::exists(&store_path) {
+        let store = File::open(&store_path).unwrap();
+        let reader = BufReader::new(store);
+
+        let mut todos:Vec<Notes> = serde_json::from_reader(reader).unwrap();
+
+        if index > todos.len() {
+            println!("No note with that index")
+        }
+        else {
+            todos.swap_remove(index-1);
+        
+        for i in 0..todos.len(){
+            if i >index {
+                todos[i].index = i as i32 -1
+            }
+        }
+
+
+        let file = File::create(&store_path).unwrap();
+        let writer = BufWriter::new(file);
+        serde_json::to_writer_pretty(writer, &todos).unwrap();
+        println!("Value Deleted");
+        }
+        
+    }
+}
 pub fn delete(index:usize) {
     let config_dir = dirs::config_dir().expect("Could not find config dir");
     let store_path = config_dir.join("store.json");
@@ -35,8 +66,11 @@ pub fn delete(index:usize) {
 
         let mut todos:Vec<Notes> = serde_json::from_reader(reader).unwrap();
 
-        todos.swap_remove(index-1);
-
+        if index > todos.len() {
+            println!("No note with that index")
+        }
+        else {
+            todos.swap_remove(index-1);
         
         for i in 0..todos.len(){
             if i >index {
@@ -44,9 +78,12 @@ pub fn delete(index:usize) {
             }
         }
 
+
         let file = File::create(&store_path).unwrap();
         let writer = BufWriter::new(file);
         serde_json::to_writer_pretty(writer, &todos).unwrap();
+        println!("Value Deleted");
+        }
         
     }
 }
@@ -140,10 +177,11 @@ pub fn check_completed(){
         let notes: Vec<CompletedNotes> = serde_json::from_reader(reader).unwrap();
 
         println!("{:<20} {:<20} {:<20}","Index","Note","Time Completed");
-        println!("{:>62}","");
+        println!("{:-<62}","");
 
         for note in notes {
             println!("{:<20} {:<20} {:<20}",note.index,note.note,note.date)
+            
         }
     }
 }

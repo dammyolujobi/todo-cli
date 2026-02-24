@@ -18,7 +18,8 @@ pub enum Commands {
     Clear {},
     Delete{index:usize},
     Complete{index:usize},
-    GetCompleted{}
+    GetCompleted{},
+    DeleteCompleted{index:usize}
 }
 
 pub fn increase_index(todos:&Vec<Notes>) -> i32 {

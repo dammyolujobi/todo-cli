@@ -14,6 +14,7 @@ use util::trav::delete;
 use util::trav::complete;
 use util::trav::check_completed;
 use crate::util::increase_index;
+use crate::util::trav::delete_completed;
 
 
 
@@ -23,7 +24,6 @@ struct Notes {
     note: String,
     time: String,
 }
-
 
 
 fn main() {
@@ -39,11 +39,11 @@ fn main() {
         }
         Commands::Clear {  }=>{
             clear();
+
             println!("List Cleared")
         }
         Commands::Delete{index}=>{
             delete(index);
-            println!("Value Deleted");
         }
         Commands::Complete { index }=> {
             complete(index);
@@ -51,6 +51,9 @@ fn main() {
         }
         Commands::GetCompleted {  }=> {
             check_completed();
+        }
+        Commands::DeleteCompleted{ index}=> {
+            delete_completed(index);
         }
     }
 }
